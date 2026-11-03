@@ -1,0 +1,4 @@
+#!/usr/bin/ruby
+root = File.dirname(File.realpath(__FILE__))
+%w[native store overrides cli].each { |name| require File.join(root,'lib',name) }
+exit Monitorctl::CLI.new(ARGV,File.realpath(__FILE__)).run

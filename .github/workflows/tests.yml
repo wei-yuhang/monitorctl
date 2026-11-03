@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check Ruby syntax
+        run: |
+          ruby -c monitorctl
+          for file in lib/*.rb; do ruby -c "$file"; done
+      - name: Check installer syntax
+        run: python3 -c "import ast, pathlib; ast.parse(pathlib.Path('install.py').read_text())"
+      - name: Run core tests
+        run: ruby tests/core_test.rb

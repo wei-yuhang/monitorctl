@@ -1,0 +1,4 @@
+interface:
+  display_name: "Monitor Control"
+  short_description: "Control Mac display scaling and safe previews"
+  default_prompt: "Use $monitor-control to adjust my monitor's text size with monitorctl."
