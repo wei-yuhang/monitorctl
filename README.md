@@ -1,11 +1,14 @@
+it's basic human right to scale your monitor and macOS doesn't give you that.
+
 # monitorctl
 
-A local macOS CLI for monitor scaling, resolution, refresh rate, safe previews,
-and display-mode profiles. Built for humans and coding agents, with stable
-display selectors and JSON output.
+You bought the screen. You should get to decide how big things look on it.
+Use monitorctl to pick a size you can read, set the refresh rate, and save
+a setup worth coming back to.
 
-[Monitor Deck](web/README.md) adds a browser interface for adjusting display
-modes and arranging monitors. Its local service starts when you log in.
+Prefer dragging screens around? [Monitor Deck](web/README.md) puts the controls
+in your browser. Drag each display to match where it sits on your desk. The
+dashboard starts at login.
 
 ```sh
 monitorctl list
@@ -14,7 +17,7 @@ monitorctl scale 250
 monitorctl undo
 ```
 
-## Install
+## Install the CLI
 
 ```sh
 git clone https://github.com/EricWay1024/monitorctl.git
@@ -22,44 +25,40 @@ cd monitorctl
 python3 install.py
 ```
 
-The installer copies the self-contained Ruby application to
-`~/Library/Application Support/monitorctl/app`, creates
-`/usr/local/bin/monitorctl`, and installs the included
-[`monitor-control` skill](skill/SKILL.md). It adds a conditional discovery note
-to your Codex global instructions while preserving existing content.
+You'll need macOS, its bundled Ruby, and Python 3 for the installer. Run
+display commands from a logged-in desktop session. The installer puts
+`monitorctl` in `/usr/local/bin` and keeps the app in
+`~/Library/Application Support/monitorctl/app`. It also installs the
+[monitor-control skill](skill/SKILL.md) and adds a discovery note to your Codex
+instructions.
 
-Creating the global command may show macOS's administrator authentication
-dialog. Runtime mode changes do not require administrator privileges.
+macOS may ask for your administrator password when the installer creates the
+global command. Ordinary display changes run as your user.
 
-Requirements: macOS, its bundled Ruby runtime, Python 3 for installation, and
-a logged-in graphical session for display operations. There are no third-party
-runtime packages, paid applications, or network services.
-
-To inspect the source without installing:
+Just looking? Run these from the checkout.
 
 ```sh
 ruby monitorctl --help
 ruby monitorctl list --json
 ```
 
-## Install Monitor Deck
+## Put the controls in your browser
 
-After installing the CLI, run the dashboard installer from the same checkout.
-It builds the display arrangement helper with Swift from Xcode or the Command
-Line Tools.
+Install the CLI first, then run this from the same checkout. The installer
+builds the arrangement helper with Swift from Xcode or the Command Line Tools.
 
 ```sh
 python3 web/install.py
 ```
 
-Open [Monitor Deck](http://127.0.0.1:41847) on your Mac to adjust display modes,
-preview changes, or drag monitors into place.
+Open [Monitor Deck](http://127.0.0.1:41847). Pick a display, preview a mode,
+or drag the monitors into place and click **Apply layout**.
 
-## Select a monitor
+## Pick the right screen
 
-The default display is `main`. Select another display by its stable UUID,
-current numeric ID, or an unambiguous part of its name. `external` selects
-the external display when exactly one matches.
+Commands default to the main display. Use a UUID, the current numeric ID,
+or part of the name to pick another screen. `external` works when you have
+exactly one external display.
 
 ```sh
 monitorctl list --json
@@ -69,68 +68,57 @@ monitorctl resolution 1024x640 --display DISPLAY_UUID
 monitorctl refresh 60 --display DISPLAY_UUID
 ```
 
-Use UUIDs for automation: numeric IDs can change after a reconnect. Duplicate
-name matches fail instead of selecting an arbitrary monitor.
+Use UUIDs in scripts. Numeric IDs can change when you reconnect a cable,
+and monitorctl rejects names that match more than one screen.
 
-## Scaling and HiDPI
+## Make the text big enough
 
-Percentages are relative to the native panel dimensions. For example, 250%
-on a 2560×1600 panel selects a desktop near 1024×640. Selection preserves
-aspect ratio and the current refresh rate when possible.
+Scale is relative to your panel's native dimensions. On a 2560×1600 panel,
+250% gives you a desktop near 1024×640. monitorctl keeps the aspect ratio and
+tries to keep your current refresh rate.
 
-`scale` requires HiDPI and never silently substitutes a standard
-low-resolution mode. `resolution` also uses HiDPI unless you explicitly pass
-`--standard`. Modes must be exposed by macOS before they can be selected.
+`scale` uses HiDPI, with `scale 100` for the native desktop. To pick a
+standard resolution directly, use `resolution --standard`. On the HiDPI
+modes generated here, 200% gives you exact 2× pixel mapping. Bigger text above
+200% can look softer because macOS stretches the rendered image to fit the
+panel.
 
-200% is an exact 2× pixel mapping for the generated HiDPI modes. Above 200%,
-the rendered image is enlarged to the panel and may look softer.
-
-If macOS does not expose the size you want, inspect and install custom requests:
+If the size you want is missing, add it to the list macOS considers.
 
 ```sh
 monitorctl hidpi plan --display DISPLAY_UUID --scales 200,225,250,275,300 --json
 monitorctl hidpi install --display DISPLAY_UUID --scales 200,225,250,275,300
-# Reconnect this monitor, then check which modes macOS exposes.
+# Reconnect the screen, then see what macOS accepted.
 monitorctl modes --display DISPLAY_UUID --hidpi
 ```
 
-Only the explicit `hidpi install`/`remove` operations need administrator
-authentication. Overrides preserve existing keys, other modes, and the exact
-original undo backup. Entries already installed do not prompt again. Changes
-made by another application are detected before an owned override is updated
-or removed.
+Installing or removing an override requires administrator authentication.
+monitorctl keeps the other modes and keys and saves the original file for
+undo. If another app edits an override afterward, monitorctl stops before
+overwriting it. It also recognizes backups from the earlier Larger Text tool.
 
-Overrides are stored by vendor/product and therefore apply to identical
-panels; ordinary mode changes target a single display UUID. A reconnect or
-a convenient restart is usually needed to load new requests. macOS may filter
-unsupported requests, so installation does not guarantee mode availability.
+An override applies to panels with the same vendor and product ID. Regular
+mode changes target one display UUID. You may need to reconnect the display
+or restart, and macOS can still reject a requested mode.
 
 ```sh
 monitorctl hidpi remove --display DISPLAY_UUID
 ```
 
-The ownership/backup format is compatible with the earlier Larger Text
-utility's `.larger-text-state.json` and `.larger-text-backup` files.
+## Try it before you keep it
 
-## Preview and undo
+Give a new mode 20 seconds. If the screen looks wrong, let the timer run out.
+The old mode comes back even if the shell that started the preview closes.
 
 ```sh
 monitorctl preview 200 --seconds 20 --json
-# The response includes a preview token.
 monitorctl confirm PREVIEW_TOKEN
-# Or restore immediately:
+# To go back early:
 monitorctl revert PREVIEW_TOKEN
 ```
 
-A preview returns immediately and arms an independent watchdog. Unless
-confirmed, the watchdog restores the previous mode at the deadline. This
-works in noninteractive agent sessions too. While a preview is pending,
-other mode/override mutations are blocked; status, confirm, and revert remain
-available.
-
-Direct changes apply without a confirmation prompt. Use `--dry-run` to resolve
-a change without applying it, or `--preview SECONDS` on a mode-changing command
-to arm the watchdog.
+Use the token from the preview response. While the timer runs, finish or
+revert that preview before starting another display change.
 
 ```sh
 monitorctl scale 250 --dry-run --json
@@ -139,11 +127,10 @@ monitorctl status --json
 monitorctl undo
 ```
 
-Changes normally last the current login session. Add `--permanent` to ask
-macOS to save the mode across logins. Each applied change gets an independent
-process read-back; concurrent CLI mutations are serialized with a file lock.
+Add `--permanent` if you want the mode to survive logout. The CLI reads the
+mode back after applying it and runs one change at a time.
 
-## Profiles
+## Save a setup you like
 
 ```sh
 monitorctl save desk
@@ -152,46 +139,41 @@ monitorctl restore desk --dry-run --json
 monitorctl restore desk
 ```
 
-Profiles save resolution/rendering scale and refresh rate for each active
-display. All saved displays and modes must be available before a restore
-transaction begins. They do not save display position or rotation.
+A profile saves each active display's resolution, rendering scale, and refresh
+rate. Connect all the displays in the profile before restoring it. Use Monitor
+Deck to move screens around.
 
-## Agents and diagnostics
+## Let an agent drive
 
 ```sh
 monitorctl doctor --json
 monitorctl --help
 ```
 
-`--json` emits `schema_version: 1`, `ok`, and structured results or errors.
-Success exits 0, argument errors exit 2, and failed operations exit 1.
+The bundled skill covers display selection, HiDPI, and preview recovery.
+`--json` gives you `schema_version: 1`, `ok`, and structured results or
+errors. Exit codes are 0 for success, 2 for argument errors, and 1 for failed
+operations. A remote agent needs execution access to the Mac whose displays
+it will change.
 
-The installed skill teaches agents the command syntax, UUID selection,
-HiDPI handling, and preview recovery. The CLI works independently of Codex.
-It controls this Mac's local display session; remote agents need execution
-access to that Mac.
+## What you can control
 
-## Scope
+The CLI uses Core Graphics and ColorSync to set display modes. If macOS
+doesn't flag a native size, monitorctl labels the estimate it makes from
+the mode list. Turn off mirroring before rearranging displays.
 
-The implementation uses public Core Graphics and ColorSync APIs. Native panel
-size comes from native-mode flags, with a labeled catalog fallback when those
-flags are absent. Mirrored display mutations are rejected.
+Monitor Deck handles arrangement. Brightness, input switching, volume,
+contrast, and rotation are outside its current controls.
 
-Monitor Deck manages display arrangement. Hardware DDC/CI controls such as
-brightness, contrast, input selection, and volume are outside this release,
-as is display rotation.
-
-## Tests
+## Check the code
 
 ```sh
 ruby tests/core_test.rb
 ```
 
-The suite covers scaling geometry, HiDPI selection, refresh matching, ambiguous
-selectors, state locking, and override preservation/undo. Live preview timeout,
-confirmation, revert, undo, profiles, and mode read-back were also exercised
-on an LG 16MR70. Other physical displays and reboot persistence have not been
-manually verified.
+The tests cover scaling, HiDPI selection, refresh matching, duplicate display
+names, state locking, and override undo. Preview, confirm, revert, profiles,
+and mode read-back were also tested on an LG 16MR70.
 
 ## References
 
@@ -202,4 +184,5 @@ manually verified.
 
 ## License
 
-The CLI and Monitor Deck are released under the [MIT license](LICENSE).
+monitorctl and Monitor Deck are yours to use and change under the
+[MIT license](LICENSE).
