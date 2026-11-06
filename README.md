@@ -4,6 +4,9 @@ A local macOS CLI for monitor scaling, resolution, refresh rate, safe previews,
 and display-mode profiles. Built for humans and coding agents, with stable
 display selectors and JSON output.
 
+[Monitor Deck](web/README.md) adds a browser interface for adjusting display
+modes and arranging monitors. Its local service starts when you log in.
+
 ```sh
 monitorctl list
 monitorctl modes --hidpi
@@ -38,6 +41,19 @@ To inspect the source without installing:
 ruby monitorctl --help
 ruby monitorctl list --json
 ```
+
+## Install Monitor Deck
+
+After installing the CLI, run the dashboard installer from the same checkout.
+It builds the display arrangement helper with Swift from Xcode or the Command
+Line Tools.
+
+```sh
+python3 web/install.py
+```
+
+Open [Monitor Deck](http://127.0.0.1:41847) on your Mac to adjust display modes,
+preview changes, or drag monitors into place.
 
 ## Select a monitor
 
@@ -161,8 +177,9 @@ The implementation uses public Core Graphics and ColorSync APIs. Native panel
 size comes from native-mode flags, with a labeled catalog fallback when those
 flags are absent. Mirrored display mutations are rejected.
 
-Hardware DDC/CI controls such as brightness, contrast, input selection, and
-volume are outside this release, as are arrangement and rotation.
+Monitor Deck manages display arrangement. Hardware DDC/CI controls such as
+brightness, contrast, input selection, and volume are outside this release,
+as is display rotation.
 
 ## Tests
 
@@ -182,3 +199,7 @@ manually verified.
 - [Display modes](https://developer.apple.com/documentation/coregraphics/cgdisplaymode)
 - [Codex skills](https://learn.chatgpt.com/docs/build-skills?product=codex)
 - [Global Codex instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+
+## License
+
+The CLI and Monitor Deck are released under the [MIT license](LICENSE).

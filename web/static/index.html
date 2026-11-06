@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101119">
+  <title>Monitor Deck</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="/icon.svg" width="34" height="34" alt="">
+      <span>Monitor Deck <small>macOS</small></span>
+    </div>
+    <div class="connection"><span class="status-dot"></span><span id="connection">Connecting</span></div>
+  </header>
+  <main>
+    <div class="intro">
+      <div>
+        <p class="eyebrow">WORKSPACE CONTROL</p>
+        <h1>Your displays<span>.</span></h1>
+        <p class="intro-copy">Fine-tune your monitors and make the desktop yours.</p>
+      </div>
+      <div class="intro-actions"><span id="count" class="count"></span><button class="button subtle" id="reload" type="button">↻ <span>Refresh</span></button></div>
+    </div>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <div class="dashboard">
+      <section class="panel arrangement" aria-labelledby="arrangement-title">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">01 / LAYOUT</p>
+            <h2 id="arrangement-title">Display arrangement</h2>
+          </div>
+          <span class="chip" id="layout-status">DESKTOP MAP</span>
+        </div>
+        <div class="map">
+          <svg id="diagram" viewBox="0 0 760 340" role="group" aria-label="Display arrangement. Select a display to inspect it. Drag a secondary display to move it."></svg>
+          <div id="map-empty" class="map-empty">
+            <div class="empty-icon">▣</div>
+            <strong>Looking for displays</strong>
+            <span>The desktop map will appear here.</span>
+          </div>
+          <div class="map-caption"><span><i></i> MAIN DISPLAY</span><span id="map-count">⌖ &nbsp; DISPLAY COORDINATES</span></div>
+        </div>
+        <div class="arrange-controls" id="placement" hidden>
+          <label class="anchor-label" for="anchor">Place beside <select id="anchor"></select></label>
+          <div class="direction-buttons" aria-label="Place selected display">
+            <button class="button compact" data-side="left" title="Place left">←</button>
+            <button class="button compact" data-side="above" title="Place above">↑</button>
+            <button class="button compact" data-side="below" title="Place below">↓</button>
+            <button class="button compact" data-side="right" title="Place right">→</button>
+          </div>
+          <button id="make-main" class="button subtle compact" type="button">Make main</button>
+        </div>
+        <div class="panel-footer">
+          <p id="map-hint">Drag a display to arrange your workspace.</p>
+          <div class="footer-actions">
+            <button id="undo-layout" class="button subtle" type="button" disabled>Undo</button>
+            <button id="reset-layout" class="button subtle" type="button" hidden>Reset</button>
+            <button id="apply-layout" class="button primary" type="button" disabled>Apply layout</button>
+          </div>
+        </div>
+      </section>
+      <aside class="panel inspector" aria-labelledby="inspector-title">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">02 / DISPLAY</p>
+            <h2 id="inspector-title">Display settings</h2>
+          </div>
+          <span class="inspector-mark" aria-hidden="true">◫</span>
+        </div>
+        <div id="display-list" class="display-list" aria-label="Connected displays"></div>
+        <div id="inspector-empty" class="inspector-empty">Select a connected display to see its settings.</div>
+        <form id="settings" hidden>
+          <div class="readouts">
+            <div><span>DESKTOP</span><strong id="size-value">—</strong></div>
+            <div><span>REFRESH</span><strong id="hz-value">—</strong></div>
+            <div><span>TEXT SCALE</span><strong id="scale-value">—</strong></div>
+          </div>
+          <div class="field">
+            <label for="mode">Desktop resolution</label>
+            <select id="mode"></select>
+          </div>
+          <div class="field">
+            <label for="refresh">Refresh rate</label>
+            <select id="refresh"></select>
+          </div>
+          <div class="toggles">
+            <label><input id="show-standard" type="checkbox"> Show standard modes</label>
+            <label><input id="preview-mode" type="checkbox" checked> Preview for 20 seconds</label>
+            <label><input id="remember" type="checkbox" checked> Remember after login</label>
+          </div>
+          <button id="apply-mode" class="button primary full" type="submit" disabled>Preview mode</button>
+          <button id="undo-mode" class="button subtle full" type="button">Undo last mode change</button>
+        </form>
+      </aside>
+    </div>
+    <footer class="site-footer">
+      <span>MONITOR DECK</span>
+      <span>Local to this Mac <span class="footer-separator">·</span> Powered by monitorctl</span>
+    </footer>
+  </main>
+  <div id="preview-bar" class="preview-bar" role="status" hidden>
+    <div><strong>Keep this display mode?</strong><p id="countdown"></p></div>
+    <button id="revert" class="button subtle" type="button">Revert</button>
+    <button id="keep" class="button primary" type="button">Keep changes</button>
+  </div>
+</body>
+</html>

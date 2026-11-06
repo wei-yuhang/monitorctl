@@ -3,7 +3,7 @@ require 'json'
 require 'open3'
 
 module Monitorctl
-  VERSION = '1.0.0'.freeze
+  VERSION = '1.1.0'.freeze
   class Failure < StandardError
     attr_reader :code, :details
     def initialize(code, message, details = {})
